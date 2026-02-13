@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💌 Uma perguntinha...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #fff9fb;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating hearts background */
+    .heart-particle {
+      position: fixed;
+      opacity: 0;
+      pointer-events: none;
+      animation: floatUp 6s ease-in infinite;
+      z-index: 0;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translateY(0) scale(0.5) rotate(0deg); }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-110vh) scale(1.2) rotate(30deg); }
+    }
+
+    /* Main card */
+    .card {
+      position: relative;
+      z-index: 10;
+      background: white;
+      border-radius: 32px;
+      padding: 48px 44px 44px;
+      max-width: 420px;
+      width: 90vw;
+      text-align: center;
+      box-shadow:
+        0 0 0 3px #ffd6e7,
+        0 20px 60px rgba(255,107,157,0.25),
+        0 4px 16px rgba(255,107,157,0.12);
+      animation: cardPop 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes cardPop {
+      from { opacity: 0; transform: scale(0.7) translateY(40px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .card::before {
+      content: '💝';
+      position: absolute;
+      top: -28px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 3.2rem;
+      filter: drop-shadow(0 4px 8px rgba(255,71,87,0.4));
+      animation: heartBeat 1.2s ease-in-out infinite;
+    }
+    @keyframes heartBeat {
+      0%,100% { transform: translateX(-50%) scale(1); }
+      50%      { transform: translateX(-50%) scale(1.18); }
+    }
+
+    .question {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      color: #e91e8c;
+      line-height: 1.3;
+      margin-bottom: 28px;
+    }
+
+    .gif-wrap {
+      width: 200px; height: 200px;
+      margin: 0 auto 28px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 4px solid #ffd6e7;
+      box-shadow: 0 8px 24px rgba(255,107,157,0.22);
+    }
+    .gif-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Invisible placeholder so the card layout stays */
+    #noPlaceholder {
+      display: inline-block;
+      width: 130px;
+      height: 54px;
+      visibility: hidden;
+    }
+
+    .btn {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.2rem;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #2ed573, #1abc9c);
+      color: white;
+      box-shadow: 0 6px 20px rgba(46,213,115,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-yes:hover {
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 10px 28px rgba(46,213,115,0.5);
+    }
+    .btn-yes:active { transform: scale(0.97); }
+
+    /* ===== THE FLEEING BUTTON ===== */
+    #btnNo {
+      position: fixed;        /* taken out of layout */
+      z-index: 9999;
+      background: linear-gradient(135deg, #ff4757, #c0392b);
+      color: white;
+      box-shadow: 0 6px 20px rgba(255,71,87,0.35);
+      /* CSS transition gives the smooth SLIDE feel */
+      transition: left 0.15s cubic-bezier(0.25,0.46,0.45,0.94),
+                  top  0.15s cubic-bezier(0.25,0.46,0.45,0.94);
+      pointer-events: none; /* can't be clicked! */
+      user-select: none;
+    }
+
+
+    /* SUCCESS */
+    #success-view { display: none; }
+    #success-view.show {
+      display: block;
+      animation: cardPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .love-title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      color: #e91e8c;
+      margin-bottom: 18px;
+    }
+    .sparkles {
+      font-size: 2rem; display: block; margin-bottom: 8px;
+      animation: sparkle 1s ease-in-out infinite alternate;
+    }
+    @keyframes sparkle {
+      from { transform: scale(1) rotate(-5deg); }
+      to   { transform: scale(1.15) rotate(5deg); }
+    }
+
+    .confetti-piece {
+      position: fixed; top: -20px; border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .buttons { display: flex; gap: 16px; justify-content: center; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <!-- Main Card -->
+  <div class="card" id="mainCard">
+    <div id="initial-view">
+      <p class="question">Quer namorar<br>comigo? 🥺</p>
+
+      <div class="gif-wrap">
+        <img
+          src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTZ6MGJrbnl5NXpvdnhicXIwcHhtZ2Q5dDkwODF4eWUyNHgxN3NlbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/yjZedIjQFzXHaSVmax/giphy.gif"
+          alt="gif fofo"
+          onerror="this.src='https://media.giphy.com/media/xT9IgG50Lg7russbDa/giphy.gif'"
+        />
+      </div>
+
+      <div class="buttons">
+        <button class="btn btn-yes" id="btnYes" onclick="onYes()">💚 Sim</button>
+        <div id="noPlaceholder"></div>
+      </div>
+    </div>
+
+    <div id="success-view">
+      <span class="sparkles">✨🌸✨</span>
+      <p class="love-title">Te amoooooo! 💕</p>
+      <div class="gif-wrap" style="width:220px;height:220px;margin:0 auto 12px;">
+        <img
+          src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDU4ZDJlZjMzanUzZjdvdXhkaWxrOTU3ajA1cHN5Nm93M2ZsejB5YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LQF7QwdaoUOFhWBb0b/giphy.gif"
+          alt="gif amor"
+          onerror="this.src='https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif'"
+        />
+      </div>
+      <p style="font-size:1rem;color:#e91e8c;font-weight:700;margin-top:10px;">
+        Sabia que você ia dizer simmmmmmm
+      </p>
+    </div>
+  </div>
+
+  <!-- "Não" lives OUTSIDE the card so fixed positioning is free -->
+  <button class="btn" id="btnNo">❌ Não</button>
+
+  <script>
+    /* ── Floating hearts ── */
+    const emojis = ['💗','💖','💓','💕','❤️','🌸','✨','💝'];
+    for (let i = 0; i < 28; i++) {
+      const h = document.createElement('div');
+      h.className = 'heart-particle';
+      h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      h.style.left   = (Math.random() * 100) + 'vw';
+      h.style.top    = (Math.random() * 100) + 'vh';
+      h.style.fontSize = (0.9 + Math.random() * 1.6) + 'rem';
+      h.style.animationDelay    = (Math.random() * 6) + 's';
+      h.style.animationDuration = (4 + Math.random() * 5) + 's';
+      document.body.appendChild(h);
+    }
+
+    /* ── Fleeing "Não" button logic ── */
+    const btnNo = document.getElementById('btnNo');
+
+    // We track position in JS variables — NOT from getBoundingClientRect,
+    // because CSS transitions make that unreliable mid-animation.
+    let noX = 0, noY = 0;
+    const BTN_W = 130, BTN_H = 54;
+    const FLEE_RADIUS = 170; // distance (px) that triggers fleeing
+    const JUMP_MULT   = 2.2; // how many radii it jumps away
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function placeInitial() {
+      const ph = document.getElementById('noPlaceholder').getBoundingClientRect();
+      noX = ph.left;
+      noY = ph.top;
+      commit();
+    }
+
+    function commit() {
+      btnNo.style.left = noX + 'px';
+      btnNo.style.top  = noY + 'px';
+    }
+
+    function onPointer(px, py) {
+      const cx = noX + BTN_W / 2;
+      const cy = noY + BTN_H / 2;
+      const dx = cx - px;
+      const dy = cy - py;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < FLEE_RADIUS) {
+        const angle = Math.atan2(dy, dx);
+        const jump  = FLEE_RADIUS * JUMP_MULT * (1 - dist / FLEE_RADIUS + 0.5);
+
+        noX += Math.cos(angle) * jump;
+        noY += Math.sin(angle) * jump;
+
+        const margin = 12;
+        noX = clamp(noX, margin, window.innerWidth  - BTN_W  - margin);
+        noY = clamp(noY, margin, window.innerHeight - BTN_H - margin);
+
+        commit();
+      }
+    }
+
+    document.addEventListener('mousemove', e => onPointer(e.clientX, e.clientY));
+    document.addEventListener('touchstart', e => {
+      const t = e.touches[0]; onPointer(t.clientX, t.clientY);
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      const t = e.touches[0]; onPointer(t.clientX, t.clientY);
+    }, { passive: true });
+
+    window.addEventListener('load', () => {
+      placeInitial();
+    });
+    window.addEventListener('resize', placeInitial);
+
+    /* ── Sim ── */
+    function onYes() {
+      document.getElementById('initial-view').style.display = 'none';
+      btnNo.style.display = 'none';
+      document.getElementById('success-view').classList.add('show');
+      launchConfetti();
+    }
+
+    /* ── Confetti ── */
+    function launchConfetti() {
+      const colors = ['#ff6b9d','#ff4757','#ffd32a','#2ed573','#1e90ff','#a29bfe','#fd79a8'];
+      for (let i = 0; i < 130; i++) {
+        setTimeout(() => {
+          const c = document.createElement('div');
+          c.className = 'confetti-piece';
+          c.style.left   = (Math.random() * 100) + 'vw';
+          c.style.background   = colors[Math.floor(Math.random() * colors.length)];
+          c.style.width  = (6 + Math.random() * 10) + 'px';
+          c.style.height = (6 + Math.random() * 10) + 'px';
+          c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+          c.style.animationDuration = (1.5 + Math.random() * 3) + 's';
+          c.style.animationDelay    = (Math.random() * 0.4) + 's';
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 4500);
+        }, i * 18);
+      }
+    }
+  </script>
+</body>
+</html>
